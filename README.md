@@ -3,5 +3,5 @@ Python script to extract data from ORTEC MAESTRO List Mode files (.Lis). Specifi
 
 ### Usage from command line:
 ```
->> python process_listmode.py inputFile.Lis outFileName.csv
+python process_listmode.py inputFile.Lis outFileName.csv
 ```
