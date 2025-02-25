@@ -24,3 +24,15 @@ The file is a byte-stream of data that is parsed into a 256-byte header and subs
 The additional file ```outFileName_metadata.txt``` provides:
 - the first Windows time stamp of data request
 - mean, standard deviation, and spread (min and max value) of these delays (Hardware-Windows), which can be used to characterize the response time of the spectrometer.
+
+### Chunk processing for large files:
+**(Added 02/24/2025)** Added modified script version, ```process_listmode_chunks.py```, to be used for large input files. Script runs by loading the .Lis file in chunks of *N* MB, where *N* is a user-defined variable specified with ```-chunk-size``` or ```-c```. For example, to use 1-MB chunks:
+
+```
+python process_listmode_chunks.py inputFile.Lis outFileName.csv -c 1
+```
+- The default chunk size is **2 MB.**
+- An input file may be large if $8\times$(displayed .Lis file size) exceeds or is on the order of your computer's available RAM, or if the non-chunk script otherwise fails.
+- Anecdotal benchmark: a 2 GB file was processed in ~40 min, using a computer with 16 GB RAM and AMD Ryzen 7 3800X 8-Core Processor (3.90 GHz).
+- ADC values are cast to Int16 to reduce the file size of the output .csv. Please take note if ADC values are expected to exceed 2<sup>15</sup>.
+- The previous ```process_listmode.py``` script remains available for more verbose progress bars and debugging.
