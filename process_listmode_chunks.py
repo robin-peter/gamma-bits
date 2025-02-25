@@ -208,7 +208,6 @@ if __name__ == '__main__':
 
             # Append data to .csv file
             # Cast to smaller data types to reduce file size
-            # Also fixes floating point error on timestamp
             # Will cause issue if ADC value exceeds 2^15 - 1 = 32,767
             df = DataFrame(data={'ADC': growingADCArray,
                                  'TimeStamp': growingTimeStampArray})
