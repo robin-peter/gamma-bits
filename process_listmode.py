@@ -4,6 +4,7 @@ from tqdm import trange
 from bitstring import BitArray
 from pandas import DataFrame
 import numpy as np
+import struct
 
 FINE_TIME_SAMPLE = 200e-9  # 200 ns per fine time sample increment
 COARSE_TIME_SAMPLE = 10e-3  # 10 ms per coarse time sample increment
