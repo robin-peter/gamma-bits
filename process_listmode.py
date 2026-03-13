@@ -86,8 +86,67 @@ def handleC3Word(C3Word):
     growingC3Array.append(readableC3Word)
 
 
-def processHeader(fileContent):
-    pass  # accomodate header later
+def processHeader(header):
+    """Decode information from header of a ORTEC list file.
+
+    Bytes interpretation gathered from ORTEC document 'list-mode-file formats.pdf' found at:
+    https://www.ortec-online.com/-/media/ametekortec/manuals/l/list-mode-file-formats.pdf?la=en&revision=0b78b32a-9ee7-4243-b4ac-a8adb886381d
+
+    Parameters
+    ----------
+    header : bytes
+        256-long bytes header of a ORTEC list file
+
+
+    Return
+    ------
+    spectrum_info : dict
+        dictionary containing all relevant information extracted from the header
+    """
+
+    REFERENCE_TIME_OLE = datetime.datetime(1899, 12, 30, 0, 0, 0)
+
+    h_format = int.from_bytes(header[:4], 'little', signed=True)
+    data_style = int.from_bytes(header[4:8], 'little', signed=True)
+    acquisition_start_OLE = 86400 * struct.unpack('<d', header[8:16])[0]
+
+    s = acquisition_start_OLE // 1
+    us = round(acquisition_start_OLE % 1, 3) * 1e6
+
+    acquisition_start = REFERENCE_TIME_OLE + datetime.timedelta(seconds=s, microseconds=us)
+    detector = header[16:96].decode()
+    mcb = header[96:105].decode()
+    detector_serial = header[105:121].decode()
+    description = header[121:201].decode()
+
+    E_control = header[201:202].decode()
+    E_unit = header[202:206].decode()
+    E0 = struct.unpack('<f', header[206:210])[0]
+    E1 = struct.unpack('<f', header[210:214])[0]
+    E2 = struct.unpack('<f', header[214:218])[0]
+
+    if E_control not in ('0', ''):
+        E_params = np.array([E0, E1, E2])
+    else:
+        E_params = np.array([np.nan, np.nan, np.nan])
+
+    FWHM_control = header[218:219].decode()
+    FWHM0 = struct.unpack('<f', header[219:223])[0]
+    FWHM1 = struct.unpack('<f', header[223:227])[0]
+    FWHM2 = struct.unpack('<f', header[227:231])[0]
+
+    if FWHM_control not in ('0', ''):
+        FWHM_params = np.array([FWHM0, FWHM1, FWHM2])
+    else:
+        FWHM_params = np.array([np.nan, np.nan, np.nan])
+
+    conversion_gain = int.from_bytes(header[231:235], 'little', signed=True)
+    detector_ID = int.from_bytes(header[235:239], 'little', signed=True)
+    real_time = struct.unpack('<f', header[239:243])[0]
+    live_time = struct.unpack('<f', header[243:247])[0]
+    #char = header[247:255].decode() #unused bytes
+
+    return {'header_format':h_format, 'data_style':data_style, 'acquisition_start':acquisition_start, 'detector':detector, 'mcb':mcb, 'detector_serial':detector_serial, 'description':description, 'E_unit':E_unit, 'E_control':E_control, 'E_params':E_params, 'FWHM_control':FWHM_control, 'FWHM_params':FWHM_params, 'conversion_gain':conversion_gain, 'detector_ID':detector_ID, 'real_time':real_time, 'live_time':live_time}
 
 
 def win2dt(s, us):
@@ -138,7 +197,7 @@ if __name__ == '__main__':
     with open(inListModeFile, mode='rb') as f:
         fContent = f.read()
 
-    processHeader(fContent)
+    spectrum_info = processHeader(fContent[:HEADER_BYTE_LENGTH])
 
     # Get 32-bit words from bitstring
     ListModeData = fContent[HEADER_BYTE_LENGTH:]
