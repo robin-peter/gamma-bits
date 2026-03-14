@@ -1,0 +1,17 @@
+Header Format: -13
+Data Style: 2
+Acquisition Start: 2023-09-26 16:10:00
+Detector: IDM-8
+MCB: DETN-006
+Detector Serial: SDETN-150837480
+Description: 
+Energy Units: keV
+Energy Params: [0.         0.36569339 0.        ]
+FWHM Params: [31.43153954  0.          0.        ]
+Conversion Gain: 8192
+Detector ID: 5
+Real Time: 317.1400146484375 s
+Live Time: 300.0 s
+
+First UMCBI TimeStamp: 2023-09-26 23:10:04.629000
+Hardware Response Time: -0.307083360603657 +/- 0.004568224354414658 s (np.float64(-0.3207324000000007), np.float64(-0.17900000000003047)) (min, max)
